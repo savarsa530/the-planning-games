@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>The Planning Games</title>
+<meta name="description" content="A 10-minute screen-share warm-up game for each morning of PI planning.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231A1446'/%3E%3Cpath d='M32 12l11 20H21z' fill='%23FFD000'/%3E%3Crect x='14' y='38' width='36' height='12' rx='3' fill='%2378E1E1'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap">
+<style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style>
+<style>
+/* Layout: a screen-share game board. Tabs for three days, a scoreboard and host notes; each day is an intro card then one big question at a time.
+   Liberty brand palette: Liberty Blue ground (dark reads well over screen share), Liberty Yellow for answers and scores, Liberty Teal for actions. */
+:root{
+  --night:#1A1446;      /* Liberty Blue */
+  --plum:#241D5A;       /* raised surface, a step lighter than Liberty Blue */
+  --forest:#0B2F4A;     /* toward Liberty Dark Teal, for gradients */
+  --mint:#78E1E1;       /* Liberty Teal */
+  --gold:#FFD000;       /* Liberty Yellow */
+  --marigold:#FFD000;   /* warnings use Liberty Yellow (approved on Liberty Blue) */
+  --darkteal:#06748C;   /* Liberty Dark Teal, for text on white buttons */
+  --white:#FFFFFF;
+  --rose:#78E1E1;       /* early-morning zones */
+  --ink:#F5F5F5;        /* Liberty Atmospheric White */
+  --muted:rgba(245,245,245,.8); /* Atmospheric White at 80%, still well above contrast minimums on Liberty Blue */
+  --line:rgba(245,245,245,.16);
+  --display:"Roboto",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --mono:"Roboto",system-ui,-apple-system,"Segoe UI",Arial,sans-serif; /* brand guide: Roboto for employee-made materials */
+  color-scheme:dark;
+}
+html,body{background:var(--night);color:var(--ink)}
+body{font-family:var(--display);font-size:18px;line-height:1.5;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+main{max-width:980px;margin:0 auto;padding-inline:20px;padding-block:22px 70px;display:flex;flex-direction:column;gap:26px}
+h1,h2,h3{font-weight:500;line-height:1.08;text-wrap:balance;margin:0}
+p{margin:0}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--mint);outline-offset:3px;border-radius:6px}
+.label{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mint)}
+.fine{font-family:var(--mono);font-size:11.5px;color:var(--muted);line-height:1.6}
+.btn{border:0;background:var(--mint);padding:12px 22px;border-radius:999px;font-family:var(--display);font-size:15px;font-weight:700;letter-spacing:.01em;color:var(--night);transition:filter .15s,transform .15s}
+.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn.gold{background:var(--gold);color:var(--night)}
+.btn.quiet{background:var(--white);color:var(--darkteal)}
+.btn.sm{padding:8px 15px;font-size:13px}
+.btn:disabled{opacity:.4;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+header{display:flex;flex-direction:column;gap:12px}
+header h1{font-size:clamp(40px,7vw,64px);font-weight:300;letter-spacing:-.01em}
+header h1 em{color:var(--gold);font-style:normal;font-weight:700}
+.zones{display:flex;flex-wrap:wrap;gap:8px}
+.zone{border:1px solid var(--line);border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;gap:1px;min-width:0}
+.zone .t{font-family:var(--mono);font-size:15px;color:var(--ink);font-variant-numeric:tabular-nums}
+.zone .w{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em}
+.zone.early .t{color:var(--rose)}
+.zone.late .t{color:var(--gold)}
+
+nav.tabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;margin-inline:-20px;padding-inline:20px;border-bottom:1px solid var(--line);padding-bottom:12px}
+nav.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1px solid var(--line);background:transparent;border-radius:999px;padding:9px 16px;font-family:var(--mono);font-size:12.5px;letter-spacing:.05em;color:var(--muted);white-space:nowrap}
+.tab[aria-selected="true"]{border-color:var(--gold);background:var(--gold);color:var(--night);font-weight:700}
+
+.intro{border:1px solid var(--line);border-radius:20px;padding:26px 24px;display:grid;grid-template-columns:1.3fr 1fr;gap:22px;background:radial-gradient(120% 100% at 0% 0%,rgba(120,225,225,.08),transparent 60%),var(--plum)}
+.icon{width:84px;height:84px;border-radius:18px;background:var(--ink);display:grid;place-items:center}
+.icon svg{width:60px;height:60px}
+.icon .s{fill:none;stroke:var(--night);stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.icon .y{fill:var(--gold)}
+.icon .t{fill:var(--mint)}
+.intro h2{font-size:clamp(36px,6vw,54px)}
+.intro .how{display:flex;flex-direction:column;gap:12px;min-width:0}
+.intro ol{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+.intro .tie{border-left:3px solid var(--gold);padding-left:14px;color:var(--ink)}
+.intro .score{font-family:var(--mono);font-size:13px;color:var(--gold);line-height:1.6}
+@media (max-width:720px){.intro{grid-template-columns:1fr}}
+
+.stage{border:1px solid var(--line);border-radius:22px;padding:28px 26px;display:flex;flex-direction:column;gap:20px;min-height:420px;background:linear-gradient(165deg,var(--plum),var(--forest))}
+.stage .top{display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap}
+.stage .count{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.stage .home{font-family:var(--mono);font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.q{font-size:clamp(28px,4.2vw,44px);line-height:1.2;font-weight:400}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.opt{border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;gap:12px;align-items:baseline;font-size:24px;min-width:0}
+.opt b{font-family:var(--mono);font-weight:400;font-size:16px;color:var(--mint)}
+.opt.right{border-color:var(--gold);background:rgba(255,208,0,.12)}
+.opt.right b{color:var(--gold)}
+.answer{border-top:1px solid var(--line);padding-top:18px;display:flex;flex-direction:column;gap:10px;animation:rise .5s ease both}
+.answer .big{font-family:var(--mono);font-weight:300;font-size:clamp(30px,5vw,46px);color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.1}
+.answer .fact{font-size:21px;max-width:62ch}
+.answer .src a{color:var(--mint);font-family:var(--mono);font-size:11.5px}
+@keyframes rise{from{opacity:.2;transform:translateY(6px)}to{opacity:1;transform:none}}
+.timer{display:flex;align-items:center;gap:14px}
+.clock{font-family:var(--mono);font-weight:300;font-size:46px;color:var(--mint);font-variant-numeric:tabular-nums;min-width:2.4ch}
+.clock.go{color:var(--gold)}
+.ring{width:54px;height:54px}
+.ring circle{fill:none;stroke-width:5}
+.ring .bg{stroke:var(--line)}
+.ring .fg{stroke:var(--mint);stroke-linecap:round;transition:stroke-dashoffset .25s linear}
+.ctrl{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+
+.crowd{border:1px dashed var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.crowd textarea{width:100%;box-sizing:border-box;min-height:70px;background:var(--night);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:var(--mono);font-size:13px;resize:vertical}
+.crowdout{font-family:var(--mono);font-size:13.5px;line-height:1.7;color:var(--ink)}
+.crowdout b{color:var(--gold);font-weight:400}
+
+.sort{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.item{border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.item b{font-family:var(--mono);font-weight:400;font-size:18px;color:var(--mint)}
+.item span{font-size:22px;line-height:1.2}
+.order{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.order li{display:grid;grid-template-columns:2.2em 2em 1fr auto;gap:12px;align-items:baseline;border-bottom:1px solid var(--line);padding-bottom:8px;animation:rise .45s ease both}
+.order .n{font-family:var(--mono);font-size:13px;color:var(--muted)}
+.order .l{font-family:var(--mono);font-size:18px;color:var(--gold)}
+.order .nm{font-size:22px;min-width:0}
+.order .v{font-family:var(--mono);font-size:13px;color:var(--muted);text-align:right}
+
+/* scoreboard */
+.board{display:flex;flex-direction:column;gap:14px}
+.addp{display:flex;gap:10px;flex-wrap:wrap}
+.addp input{flex:1;min-width:0;background:var(--night);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:19px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:16px}
+table{width:100%;border-collapse:collapse;min-width:680px}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}
+th{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:400}
+td.rank{font-family:var(--mono);color:var(--muted);width:2.5em}
+td.name{font-size:22px}
+td.total{font-family:var(--mono);font-size:22px;color:var(--gold);font-variant-numeric:tabular-nums}
+tr.lead td.name::after{content:" ✦";color:var(--gold)}
+.quick{white-space:nowrap}
+.qb{border:0;border-radius:999px;background:var(--gold);color:var(--night);font-weight:700;font-size:14px;padding:6px 11px;margin-right:4px}
+.qb.minus{background:var(--ink);color:var(--darkteal)}
+td input{width:4.2em;background:var(--night);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-family:var(--mono);font-size:15px;text-align:right}
+.x{background:none;border:0;font-family:var(--mono);font-size:11px;color:var(--muted);padding:0}
+.x.arm{color:var(--marigold)}
+.status{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+/* host */
+.host{display:flex;flex-direction:column;gap:16px}
+.msg{border:1px solid var(--line);border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:10px}
+.msg h3{font-size:26px}
+.msg pre{white-space:pre-wrap;font-family:var(--mono);font-size:13px;line-height:1.65;margin:0;background:var(--night);border-radius:10px;padding:12px 14px;user-select:all}
+.ros{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:10px;font-size:18px}
+.ros b{font-family:var(--mono);font-weight:400;color:var(--gold);margin-right:8px}
+.msg ul{margin:0;padding-left:1.1em;display:flex;flex-direction:column;gap:6px;font-size:19px}
+@media (prefers-reduced-motion:reduce){.answer,.order li{animation:none}.ring .fg{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="label">PI planning kickoff · Oct 13–15</span>
+    <h1>The Planning <em>Games</em></h1>
+    <div class="zones" id="zones" aria-label="Start time in each location"></div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs"></nav>
+  <section id="view" aria-live="polite"></section>
+</main>
+
+<script>
+(function(){
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const W='https://en.wikipedia.org/wiki/';
+
+/* ---------- start time across the team (fixed: 9:00 AM EDT, Oct 13 2026) ---------- */
+const START=new Date('2026-10-13T13:00:00Z');
+const ZONES=[["Seattle · California","America/Los_Angeles"],["Illinois","America/Chicago"],["Topsham · Indiana · Georgia · S. Carolina · Ontario","America/New_York"],["Halifax","America/Halifax"],["India","Asia/Kolkata"]];
+document.getElementById('zones').innerHTML=ZONES.map(([w,tz])=>{const t=START.toLocaleTimeString('en-US',{timeZone:tz,hour:'numeric',minute:'2-digit'});
+  const h=+START.toLocaleString('en-US',{timeZone:tz,hour:'numeric',hour12:false});
+  return`<div class="zone${h<7?' early':h>=17?' late':''}"><span class="t">${t}</span><span class="w">${w}</span></div>`}).join('');
+
+/* ---------- games ---------- */
+const DAYS=[
+{key:'d1',icon:'<svg viewBox="0 0 64 64" aria-hidden="true"><rect class="t" x="8" y="38" width="48" height="14" rx="3"/><rect class="s" x="8" y="38" width="48" height="14" rx="3"/><path class="s" d="M16 38v6M24 38v9M32 38v6M40 38v9M48 38v6"/><path class="y" d="M32 10l9 16H23z"/><path class="s" d="M32 10l9 16H23zM32 26v8"/></svg>',tab:'Day 1 · Estimation Showdown',title:'Estimation Showdown',date:'Tuesday, Oct 13',
+ how:["A question goes up. Type your guess in the chat, but don't send it yet.","When the timer hits zero, everyone hits send at once.","Closest guess wins the round."],
+ score:"Closest guess: 2 points. Within 10%: 1 point.",
+ tie:"PI planning is estimation under uncertainty. Watch what happens when we average everyone's guesses.",
+ qs:[
+  {q:"How many laps is the Indianapolis 500?",home:"Indiana",unit:"laps",ans:200,show:"200 laps",fact:"200 laps of a 2.5-mile oval makes the 500 miles. The fastest drivers average over 220 mph.",src:["Indianapolis 500","Indianapolis_500"]},
+  {q:"How many lunchboxes do Mumbai's dabbawalas deliver every day?",home:"Mumbai",unit:"lunchboxes",ans:200000,show:"About 200,000",fact:"Roughly 5,000 dabbawalas move 175,000–200,000 home-cooked lunches a day by bicycle and train, sorted by a color-coded system. Harvard Business School has studied it.",src:["Dabbawala","Dabbawala"]},
+  {q:"During Dasara, how many light bulbs light up the Mysore Palace?",home:"Karnataka",unit:"bulbs",ans:100000,show:"About 100,000",fact:"Roughly 100,000 bulbs cover the palace, its gates and nearby temples, every night of the festival.",src:["Mysore Palace","Mysore_Palace"]},
+  {q:"How long is Ontario's Highway 401, end to end? (miles, or add \"km\")",home:"Ontario",unit:"mi",ans:514.5,show:"514 miles (828 km)",fact:"The stretch through Toronto is the busiest highway in North America.",src:["Ontario Highway 401","Ontario_Highway_401"]},
+  {q:"Straight-line distance from Seattle to Hyderabad? (miles, or add \"km\")",home:"Seattle · Hyderabad",unit:"mi",ans:7765,show:"About 7,765 miles (12,496 km)",fact:"Topsham to Hyderabad is about 7,755 miles. Seattle and Maine are almost exactly the same distance from Hyderabad, only 10 miles apart.",src:null},
+  {q:"How many passengers went through Atlanta's airport in 2024?",home:"Georgia",unit:"passengers",ans:108067766,show:"About 108 million",fact:"Hartsfield–Jackson has been the world's busiest airport by passengers almost every year since 1998.",src:["Hartsfield–Jackson Atlanta International Airport","Hartsfield%E2%80%93Jackson_Atlanta_International_Airport"]}],
+ tb:{q:"Tiebreaker: Mumbai's suburban trains carry how many journeys a year? Higher or lower than 1 billion?",ans:"Higher: about 2.34 billion",src:["Mumbai Suburban Railway","Mumbai_Suburban_Railway"]}},
+{key:'d2',icon:'<svg viewBox="0 0 64 64" aria-hidden="true"><rect class="y" x="10" y="40" width="10" height="14"/><rect class="t" x="27" y="28" width="10" height="26"/><rect class="y" x="44" y="14" width="10" height="40"/><path class="s" d="M10 40h10v14H10zM27 28h10v26H27zM44 14h10v40H44zM6 54h52"/></svg>',tab:'Day 2 · Sort It',title:'Sort It',date:'Wednesday, Oct 14',
+ how:["Five things go up, each with a letter.","Put them in order and type the letters in the chat, like C-A-E-B-D.","Everyone sends when the timer hits zero."],
+ score:"Score yourself: 1 point for each letter in the right position. Up to 5 per round. Post your day total at the end.",
+ tie:"Sequencing is the hard part of planning. Everything looks obvious until you have to put it in order.",
+ qs:[
+  {q:"Oldest to newest",home:"everyone",items:[["A","Seattle is founded"],["B","Hyderabad's Charminar is built"],["C","Halifax is founded"],["D","Charleston, SC is founded"],["E","Pune's Shaniwar Wada palace is finished"]],order:[["B",1591],["D",1670],["E",1732],["C",1749],["A",1851]],fact:"Charminar is older than every city on the North American side of this team.",src:["Charminar","Charminar"]},
+  {q:"Tallest to shortest",home:"everyone",items:[["A","Space Needle, Seattle"],["B","Charminar, Hyderabad"],["C","CN Tower, Toronto"],["D","Golden Gate Bridge towers"],["E","Willis Tower, Chicago"]],order:[["C","553 m"],["E","442 m"],["D","227 m"],["A","184 m"],["B","56 m"]],fact:"The Charminar is 184 feet tall. The Space Needle is 184 meters.",src:["Space Needle","Space_Needle"]},
+  {q:"Closest to farthest from Topsham, Maine",home:"everyone",items:[["A","Seattle"],["B","Chennai"],["C","Halifax"],["D","Chicago"],["E","Pune"]],order:[["C","320 mi"],["D","903 mi"],["A","2,489 mi"],["E","7,553 mi"],["B","8,075 mi"]],fact:"Pune is closer than Chennai. On a globe, the shortest path from Maine runs over the top of the world, and Chennai sits farther east.",src:null}],
+ tb:{q:"Tiebreaker: how many of the Great Lakes touch Ontario? Higher or lower than 3?",ans:"Higher: 4. Superior, Huron, Erie and Ontario. Lake Michigan is the only one entirely in the US.",src:["Great Lakes","Great_Lakes"]}},
+{key:'d3',icon:'<svg viewBox="0 0 64 64" aria-hidden="true"><circle class="t" cx="32" cy="34" r="20"/><circle class="y" cx="32" cy="34" r="9"/><circle class="s" cx="32" cy="34" r="20"/><circle class="s" cx="32" cy="34" r="9"/><path class="s" d="M32 34L50 14M44 14h6v6"/></svg>',tab:'Day 3 · Confidence Bets',title:'Confidence Bets',date:'Thursday, Oct 15',
+ how:["A question goes up with three answers.","Type your letter and how sure you are from 1 to 5, like B4.","Send when the timer hits zero."],
+ score:"Score yourself: right = + your bet. Wrong = − your bet. Being confidently wrong costs you. Post your day total at the end.",
+ tie:"At the end of today we'll take a real confidence vote. This is practice for being honest about how sure we are.",
+ qs:[
+  {q:"How many languages are listed in India's constitution (the Eighth Schedule)?",home:"India",opts:[["A","4"],["B","22"],["C","47"]],right:"B",fact:"22 languages, including Telugu, Tamil, Kannada, Marathi and Hindi. Hundreds more are spoken across the country.",src:["Eighth Schedule to the Constitution of India","Eighth_Schedule_to_the_Constitution_of_India"]},
+  {q:"Which company was NOT founded in the Seattle area?",home:"Seattle",opts:[["A","Starbucks"],["B","Amazon"],["C","Microsoft"]],right:"C",fact:"Microsoft was founded in Albuquerque, New Mexico, in 1975. It moved to the Seattle area in 1979.",src:["Microsoft","Microsoft"]},
+  {q:"What is Halifax's official food?",home:"Halifax",opts:[["A","Lobster roll"],["B","Poutine"],["C","Donair"]],right:"C",fact:"The donair became the official food in 2015. The council vote was tied, and the mayor cast the deciding vote.",src:["Donair","Donair"]},
+  {q:"Chennai's Marina Beach faces which body of water?",home:"Chennai",opts:[["A","Arabian Sea"],["B","Bay of Bengal"],["C","Indian Ocean"]],right:"B",fact:"India's east coast faces the Bay of Bengal. Mumbai, on the west coast, faces the Arabian Sea.",src:["Marina Beach","Marina_Beach"]},
+  {q:"What is the official name of the Golden Gate Bridge's color?",home:"California",opts:[["A","Golden Gate Red"],["B","International Orange"],["C","Pacific Rust"]],right:"B",fact:"International Orange was chosen because it fits the landscape and stays visible in fog.",src:["Golden Gate Bridge","Golden_Gate_Bridge"]},
+  {q:"Telangana, home of Hyderabad, became India's newest state in which year?",home:"Hyderabad",opts:[["A","1956"],["B","2000"],["C","2014"]],right:"C",fact:"Telangana was formed on June 2, 2014. People celebrate Telangana Formation Day every year.",src:["Telangana","Telangana"]}],
+ tb:{q:"Tiebreaker: straight-line distance from Topsham to Hyderabad. Higher or lower than 10,000 km?",ans:"Higher: about 12,480 km (7,755 miles)",src:null}}];
+
+/* ---------- state ---------- */
+let tab='d1';const pos={d1:-1,d2:-1,d3:-1};const revealed={};let timer=null,tLeft=0;const TLEN=30;
+try{const t=localStorage.getItem('pg-tab');if(t)tab=t}catch(e){}
+
+const tabsEl=document.getElementById('tabs'),view=document.getElementById('view');
+const TABS=[...DAYS.map(d=>[d.key,d.tab]),['board','Scoreboard'],['host','Host notes']];
+function drawTabs(){tabsEl.innerHTML=TABS.map(([k,v])=>`<button class="tab" role="tab" aria-selected="${k===tab}" data-tab="${k}">${v}</button>`).join('');
+  tabsEl.querySelectorAll('[data-tab]').forEach(b=>b.onclick=()=>{tab=b.dataset.tab;try{localStorage.setItem('pg-tab',tab)}catch(e){}stopTimer();render()});}
+
+function srcLink(s){return s?`<p class="src"><a href="${W}${s[1]}" target="_blank" rel="noopener">Source: ${esc(s[0])} ↗</a></p>`:'<p class="fine">Straight-line distance, worked out from city coordinates.</p>'}
+
+/* ---------- timer ---------- */
+function stopTimer(){if(timer){clearInterval(timer);timer=null}}
+function startTimer(){stopTimer();tLeft=TLEN;paintTimer();timer=setInterval(()=>{tLeft--;paintTimer();if(tLeft<=0)stopTimer()},1000)}
+function paintTimer(){const c=document.getElementById('clock'),fg=document.getElementById('ringfg');if(!c)return;
+  c.textContent=tLeft>0?tLeft:'GO';c.classList.toggle('go',tLeft<=0);
+  const C=2*Math.PI*23;fg.style.strokeDasharray=C;fg.style.strokeDashoffset=C*(1-Math.max(tLeft,0)/TLEN);}
+
+/* ---------- crowd average (day 1) ---------- */
+function parseGuesses(text,unit){const out=[];const re=/(\d[\d,]*\.?\d*)\s*(k|thousand|m|mil|million|b|billion|km)?\b/gi;let m;
+  while((m=re.exec(text))){let n=parseFloat(m[1].replace(/,/g,''));if(!isFinite(n))continue;const s=(m[2]||'').toLowerCase();
+    if(s==='k'||s==='thousand')n*=1e3;else if(s==='m'||s==='mil'||s==='million')n*=1e6;else if(s==='b'||s==='billion')n*=1e9;else if(s==='km'&&unit==='mi')n/=1.609344;
+    out.push(n)}
+  return out;}
+const fmtN=n=>n>=1e6?(n/1e6).toFixed(n>=1e7?0:1)+' million':Math.round(n).toLocaleString('en-US');
+
+/* ---------- render ---------- */
+function render(){drawTabs();
+  if(tab==='board')return renderBoard();
+  if(tab==='host')return renderHost();
+  const d=DAYS.find(x=>x.key===tab);const i=pos[tab];
+  if(i<0){view.innerHTML=`<div class="intro"><div class="how"><div class="icon">${d.icon}</div><span class="label">${d.date}</span><h2>${d.title}</h2>
+      <ol>${d.how.map(h=>`<li>${esc(h)}</li>`).join('')}</ol><p class="score">${esc(d.score)}</p></div>
+      <div class="how"><span class="label">why this game</span><p class="tie">${esc(d.tie)}</p>
+      <div class="row" style="margin-top:auto"><button class="btn gold" id="begin">Start round 1</button></div></div></div>`;
+    document.getElementById('begin').onclick=()=>{pos[tab]=0;render()};return;}
+  const isTb=i>=d.qs.length;const Q=isTb?null:d.qs[i];const rk=tab+':'+i;const rev=!!revealed[rk];
+  let body='';
+  if(isTb){body=`<p class="q">${esc(d.tb.q)}</p><p class="fine">Answer H or L in chat. Use only if scores are tied.</p>
+      ${rev?`<div class="answer"><p class="big">${esc(d.tb.ans)}</p>${srcLink(d.tb.src)}</div>`:''}`}
+  else if(tab==='d1'){body=`<p class="q">${esc(Q.q)}</p>
+      ${rev?`<div class="answer"><p class="big">${esc(Q.show)}</p><p class="fact">${esc(Q.fact)}</p>${srcLink(Q.src)}</div>
+      <div class="crowd"><span class="label">wisdom of the crowd</span><p class="fine">Type the guesses you see in chat, separated by spaces. No names needed. 200k and 1.5m work too.</p>
+        <textarea id="crowdIn" aria-label="Guesses from chat" placeholder="250 180 300 150"></textarea><div class="row"><button class="btn sm" id="crowdGo">Average the team</button></div><div class="crowdout" id="crowdOut"></div></div>`:''}`}
+  else if(tab==='d2'){body=`<p class="q">${esc(Q.q)}</p>
+      <div class="sort">${Q.items.map(([l,t])=>`<div class="item"><b>${l}</b><span>${esc(t)}</span></div>`).join('')}</div>
+      ${rev?`<div class="answer"><span class="label">the order</span><ol class="order">${Q.order.map(([l,v],k)=>`<li style="animation-delay:${reduce?0:k*.35}s"><span class="n">${k+1}</span><span class="l">${l}</span><span class="nm">${esc(Q.items.find(x=>x[0]===l)[1])}</span><span class="v">${esc(v)}</span></li>`).join('')}</ol>
+        <p class="big" style="font-size:28px">${Q.order.map(o=>o[0]).join('-')}</p><p class="fact">${esc(Q.fact)}</p>${srcLink(Q.src)}</div>`:''}`}
+  else{body=`<p class="q">${esc(Q.q)}</p>
+      <div class="opts">${Q.opts.map(([l,t])=>`<div class="opt${rev&&l===Q.right?' right':''}"><b>${l}</b><span>${esc(t)}</span></div>`).join('')}</div>
+      ${rev?`<div class="answer"><p class="big">${Q.right}: ${esc(Q.opts.find(o=>o[0]===Q.right)[1])}</p><p class="fact">${esc(Q.fact)}</p>${srcLink(Q.src)}</div>`:''}`}
+  const total=d.qs.length;
+  view.innerHTML=`<div class="stage"><div class="top"><span class="count">${isTb?'Tiebreaker':`Round ${i+1} of ${total}`}</span>${!isTb&&Q.home?`<span class="home">home advantage: ${esc(Q.home)}</span>`:''}</div>
+    ${body}
+    <div class="ctrl"><div class="timer">${rev?'':`<svg class="ring" viewBox="0 0 54 54" aria-hidden="true"><circle class="bg" cx="27" cy="27" r="23"/><circle class="fg" id="ringfg" cx="27" cy="27" r="23" transform="rotate(-90 27 27)"/></svg><span class="clock" id="clock">${TLEN}</span><button class="btn sm quiet" id="tgo">Start ${TLEN}s</button>`}</div>
+      <div class="row"><button class="btn sm quiet" id="prev">Back</button>${rev?'':`<button class="btn gold" id="rev">Reveal</button>`}<button class="btn" id="next">${i<total-1?'Next round':isTb?'Done':'Tiebreaker'}</button></div></div>
+  </div>`;
+  if(!rev){tLeft=TLEN;paintTimer();document.getElementById('tgo').onclick=startTimer;document.getElementById('rev').onclick=()=>{revealed[rk]=1;stopTimer();render()};}
+  document.getElementById('prev').onclick=()=>{stopTimer();pos[tab]=Math.max(-1,i-1);render()};
+  document.getElementById('next').onclick=()=>{stopTimer();if(isTb){tab='board';try{localStorage.setItem('pg-tab',tab)}catch(e){}}else pos[tab]=i+1;render()};
+  const cg=document.getElementById('crowdGo');if(cg)cg.onclick=()=>{const g=parseGuesses(document.getElementById('crowdIn').value,Q.unit).filter(n=>n>0);const out=document.getElementById('crowdOut');
+    if(g.length<2){out.textContent='Paste at least two guesses.';return}
+    const avg=g.reduce((a,b)=>a+b,0)/g.length;const s=g.slice().sort((a,b)=>a-b);const med=s.length%2?s[(s.length-1)/2]:(s[s.length/2-1]+s[s.length/2])/2;
+    const err=x=>Math.abs(x-Q.ans)/Q.ans;const beat=g.filter(x=>err(x)>err(med)).length;
+    out.innerHTML=`${g.length} guesses. Team average: <b>${fmtN(avg)}</b>. Team median: <b>${fmtN(med)}</b>, ${Math.round(err(med)*100)}% off.<br>The team's middle guess beat <b>${beat} of ${g.length}</b> individual guesses.`;};
+}
+
+/* ---------- scoreboard: kept only in this browser, so no names leave the computer it runs on ---------- */
+let board={players:[]},bStatus='';
+const todayKey=(()=>{const d=new Date().toLocaleDateString('en-CA',{timeZone:'America/New_York'});return d==='2026-10-14'?'d2':d==='2026-10-15'?'d3':'d1'})();let scoreDay=todayKey;
+const LKEY='pg-board-v1';
+function loadLocal(){try{return JSON.parse(localStorage.getItem(LKEY))||{players:[]}}catch(e){return{players:[]}}}
+function saveLocal(b){try{localStorage.setItem(LKEY,JSON.stringify(b))}catch(e){}}
+board=loadLocal();
+let saveT=null;
+function persist(){saveLocal(board)}
+const tot=p=>(+p.d1||0)+(+p.d2||0)+(+p.d3||0);
+function renderBoard(){
+  const ps=board.players.map((p,i)=>({...p,i})).sort((a,b)=>tot(b)-tot(a)||a.name.localeCompare(b.name));
+  const top=ps.length?tot(ps[0]):0;
+  view.innerHTML=`<div class="board"><div class="row" style="justify-content:space-between"><h2 style="font-size:clamp(34px,6vw,50px)">Scoreboard</h2><span class="status">${esc(bStatus)}</span></div>
+    <div class="row"><span class="label">quick add counts toward</span>${['d1','d2','d3'].map(k=>`<button class="tab" aria-selected="${k===scoreDay}" data-sd="${k}">${k.replace('d','Day ')}</button>`).join('')}</div>
+    <form class="addp" id="addp"><input type="text" id="pname" placeholder="Add a player's name" aria-label="Player name" autocomplete="off"><button class="btn sm" type="submit">Add</button></form>
+    ${ps.length?`<div class="tablewrap"><table><thead><tr><th></th><th>Name</th><th>Day 1</th><th>Day 2</th><th>Day 3</th><th>Total</th><th>Quick add · ${scoreDay.replace('d','Day ')}</th><th></th></tr></thead><tbody>
+    ${ps.map((p,r)=>`<tr class="${top>0&&tot(p)===top?'lead':''}"><td class="rank">${r+1}</td><td class="name">${esc(p.name)}</td>
+      ${['d1','d2','d3'].map(k=>`<td><input type="number" inputmode="numeric" id="s-${p.i}-${k}" data-i="${p.i}" data-k="${k}" value="${p[k]??''}" aria-label="${esc(p.name)} ${k.replace('d','day ')}"></td>`).join('')}
+      <td class="total">${tot(p)}</td><td class="quick"><button class="qb" data-q="${p.i}" data-v="2">+2</button><button class="qb" data-q="${p.i}" data-v="1">+1</button><button class="qb minus" data-q="${p.i}" data-v="-1">−1</button></td><td><button class="x" data-del="${p.i}">remove</button></td></tr>`).join('')}
+    </tbody></table></div>`:`<p class="fine">Add names as people join. You can add someone partway through the week.</p>`}
+    <p class="fine">Day 1: tap +2 for the closest guess and +1 for anyone within 10%. Days 2 and 3: players post their own totals in chat, and you type them into that day's column. Scores stay in this browser only. Nothing is stored online.</p></div>`;
+  view.querySelectorAll('[data-sd]').forEach(b=>b.onclick=()=>{scoreDay=b.dataset.sd;renderBoard()});
+  view.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const p=board.players[+b.dataset.q];p[scoreDay]=(+p[scoreDay]||0)+(+b.dataset.v);persist();renderBoard()});
+  document.getElementById('addp').onsubmit=e=>{e.preventDefault();const n=document.getElementById('pname').value.trim();if(!n)return;board.players.push({name:n});persist();renderBoard();document.getElementById('pname').focus()};
+  view.querySelectorAll('td input').forEach(inp=>inp.onchange=()=>{const p=board.players[+inp.dataset.i];const v=inp.value.trim();p[inp.dataset.k]=v===''?null:+v;persist();renderBoard()});
+  view.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{if(!b.classList.contains('arm')){b.classList.add('arm');b.textContent='tap again';setTimeout(()=>{b.classList.remove('arm');b.textContent='remove'},3000);return}
+    board.players.splice(+b.dataset.del,1);persist();renderBoard()});
+}
+/* ---------- host notes ---------- */
+function renderHost(){
+  const invite=`Kicking off each PI planning morning (Oct 13–15) with a 10-minute game: The Planning Games.
+
+Day 1: Estimation Showdown
+Day 2: Sort It
+Day 3: Confidence Bets
+
+Points carry across all three days, and the overall winner is crowned Thursday, right before our confidence vote.
+
+No prep, no downloads. Just Teams chat. We start right at 9:00 ET (6:30 PM in India, 6:00 AM Pacific, thank you West Coast!).`;
+  const day=[
+   ["Day 1 chat message","Estimation Showdown! Type your guess but DON'T hit send until the timer says GO. Closest guess gets 2 points, within 10% gets 1."],
+   ["Day 2 chat message","Sort It! Put the five letters in order, like C-A-E-B-D. Hold it until GO. Score yourself 1 point per letter in the right spot and post your total at the end."],
+   ["Day 3 chat message","Confidence Bets! Type your letter + how sure you are 1–5 (like B4). Hold until GO. Right = +bet, wrong = −bet. Post your total at the end. Then we vote for real."]];
+  view.innerHTML=`<div class="host">
+    <div class="msg"><span class="label">each morning, about 10 minutes</span><h3>Run of show</h3><ol class="ros">
+      <li><b>8:50</b> Open this page on the day's tab. Check the scoreboard loads. Open Teams chat next to it.</li>
+      <li><b>9:00</b> Share this browser tab. Start on the intro card and read the three rules out loud. Paste the day's chat message (below).</li>
+      <li><b>Each round</b> Read the question aloud and name the home advantage. Press <i>Start 30s</i>. At GO, everyone sends. Press <i>Reveal</i> and read the fun fact. If there's time, ask the person from that place one quick question.</li>
+      <li><b>Scoring</b> Day 1: award points after each round. Days 2 and 3: ask for totals at the end.</li>
+      <li><b>~9:10</b> Open the Scoreboard tab. Name the leader and tease tomorrow's game. Stop sharing and move into planning.</li>
+      <li><b>Thursday</b> Crown the winner, then: "Now let's vote for real."</li></ol>
+      <p class="fine">If you lose your place, press Back. If time is short, skip rounds and go straight to the Scoreboard. Nobody knows how many rounds there were.</p></div>
+    <div class="msg"><span class="label">send before Oct 13</span><h3>Invite</h3><pre id="inv">${esc(invite)}</pre><div class="row"><button class="btn sm" data-copy="inv">Copy</button><span class="status" id="cs-inv"></span></div></div>
+    ${day.map(([h,t],k)=>`<div class="msg"><span class="label">paste in chat at 9:00</span><h3>${h}</h3><pre id="dm${k}">${esc(t)}</pre><div class="row"><button class="btn sm" data-copy="dm${k}">Copy</button><span class="status" id="cs-dm${k}"></span></div></div>`).join('')}
+    <div class="msg"><span class="label">running it</span><h3>Host tips</h3><ul>
+      <li>Keep it to about 10 minutes. It's 6:30 PM in India and 6:00 AM on the West Coast.</li>
+      <li>Read each question aloud as well as showing it, for anyone who's audio-only.</li>
+      <li>Say the home-advantage tag out loud. "This one's for Indiana" invites people in.</li>
+      <li>After a reveal, ask the person from that place one quick question. That's where the fun conversations start.</li>
+      <li>On Day 1, try the wisdom-of-the-crowd box at least once. It's the planning lesson.</li>
+      <li>Thursday: crown the winner, then say "Now let's vote for real" and move into the confidence vote.</li></ul></div></div>`;
+  view.querySelectorAll('[data-copy]').forEach(b=>b.onclick=async()=>{const id=b.dataset.copy;const el=document.getElementById(id);const st=document.getElementById('cs-'+id);
+    try{await navigator.clipboard.writeText(el.textContent);st.textContent='Copied.'}catch(e){const r=document.createRange();r.selectNodeContents(el);const s=getSelection();s.removeAllRanges();s.addRange(r);st.textContent='Selected. Press Ctrl+C to copy.'}});
+}
+render();
+})();
+</script>
+</body>
+</html>
